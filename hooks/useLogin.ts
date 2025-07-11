@@ -5,43 +5,52 @@ import * as z from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui";
 import { useMutation } from "@tanstack/vue-query";
 
+export default function UseLogin() {
+  const schema = z.object({
+    username: z.string().min(4, "Must be at least 4 characters"),
+    password: z.string().min(8, "Must be at least 8 characters"),
+  });
 
-export default function UseLogin(){
+  type Schema = z.output<typeof schema>;
 
-    const schema = z.object({
-      username: z.string().min(4, "Must be at least 4 characters"),
-      password: z.string().min(8, "Must be at least 8 characters"),
-    });
+  const state = reactive<Partial<Schema>>({
+    username: undefined,
+    password: undefined,
+  });
+
+  const toast = useToast();
+  const { $axios, $isAxiosError } = useNuxtApp();
+
+  const { mutateAsync, isPending } = useMutation({
+    mutationKey: ["login"],
+    mutationFn: async (data: Schema) => {
+      const res = await $axios.post("/login", data);
+      return res.data;
+    },
+    onError: (error) => {
+      if ($isAxiosError(error)) {
     
-    type Schema = z.output<typeof schema>;
+        return toast.add({
+          color: "error",
+          title: "Error",
+          description: error.response?.data.messages.error,
+        });
+      }
+      toast.add({
+        color: "error",
+        title: "Error",
+        description: "Something went wrong",
+      });
+    },
+    onSuccess: async (data) => {
     
-    const state = reactive<Partial<Schema>>({
-      username: undefined,
-      password: undefined,
-    });
-    
-    const toast = useToast();
-    const { $axios,$isAxiosError } = useNuxtApp()
-    
-    const {mutateAsync,isPending} = useMutation({
-        mutationKey:["login"],
-        mutationFn:async (data: Schema) => {
-          const res = await $axios.post("/login", data);
-          return res.data;
-        },
-        onError: (error) => {
-          if ($isAxiosError(error)) {
-            // Perbaikan kecil: Gunakan toast.add untuk menampilkan pesan error
-            return toast.add({ color:"error", title: 'Error', description: error.response?.data.messages.error });
-          }
-          toast.add({color:"error", title: 'Error', description: 'Something went wrong' });
-        },
-        onSuccess: async (data) => {
-          // Perbaikan kecil: Gunakan deskripsi agar lebih jelas
-          toast.add({ title: 'Success', description: data.message });
-          navigateTo("/")
-        },
-    });
+      console.log(data,"login")
+      const user = useState("user", () => null); // key: 'user'
+      user.value = data; // simpan data user dari response
+      toast.add({ title: "Success", description: data.message });
+      navigateTo("/");
+    },
+  });
 
   // --- BAGIAN YANG DIUBAH ---
   // Fungsi `onSubmit` sekarang menerima 'event' bertipe 'FormSubmitEvent<Schema>'
@@ -51,10 +60,10 @@ export default function UseLogin(){
   };
   // -------------------------
 
-  return{
+  return {
     onSubmit,
     isPending,
     schema,
-    state
-  }
+    state,
+  };
 }
