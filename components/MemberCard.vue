@@ -6,7 +6,7 @@ defineProps<{
 </script>
 
 <template>
-  <UCard class="bg-green-600 text-white text-center relative w-48">
+  <UCard class="bg-green-600 text-white text-center relative w-[170px]">
     <div class="flex flex-col items-center gap-2">
       <UIcon name="i-lucide-user" class="w-12 h-12" />
       <div class="font-bold">{{ username }}</div>

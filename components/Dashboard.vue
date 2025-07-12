@@ -8,8 +8,8 @@ const user = useState<UserLogin>("user")
 <template>
 
  <div class="mt-5">
-    <p class="text-3xl font-bold">Welcome {{user.data.username}}</p>
-    <p>Registered since {{user.data.created_at}}</p>
+    <p class="text-3xl font-bold">Welcome {{user.data?.username}}</p>
+    <p>Registered since {{user.data?.created_at}}</p>
    <Balance/>
   </div>
 </template>

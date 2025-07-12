@@ -15,7 +15,7 @@ const user = useState<UserLogin>("user")
       <p><BadgeDollarSign :size=48 /></p>
       <div>
         <p class="font-bold">saldo</p>
-        <p>Rp.{{user.data.saldo}}</p>
+        <p>Rp.{{data?.total_saldo}}</p>
       </div>
     </div>
     <div class="flex gap-5 p-5 border-1 w-full">

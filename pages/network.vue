@@ -25,7 +25,7 @@ const tree : {
     },
     {
       id: 3,
-      username: null,
+      username: "andi",
       position: 'right',
       children: []
     }

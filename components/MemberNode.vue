@@ -8,22 +8,41 @@ const props = defineProps<{
     id: number
     username: string | null
     joinDate?: string
-    position: 'left' | 'right'
-    children: any[]
-  }
+    children: Array<{
+      id: number
+      username: string | null
+      joinDate?: string
+      position: 'left' | 'right'
+      children: any[]
+    }>
+  },
+  level?: number
 }>()
 
-const sortedChildren = computed(() => {
-  return [...props.node.children].sort((a, b) => {
-    if (a.position === 'left' && b.position === 'right') return -1
-    if (a.position === 'right' && b.position === 'left') return 1
-    return 0
-  })
+const currentLevel = computed(() => props.level ?? 0)
+
+const displayChildren = computed(() => {
+  const leftChild = props.node.children.find(c => c.position === 'left') 
+    || { id: props.node.id * 10 + 1, username: null, position: 'left', children: [] }
+
+  const rightChild = props.node.children.find(c => c.position === 'right')
+    || { id: props.node.id * 10 + 2, username: null, position: 'right', children: [] }
+
+  return [leftChild, rightChild]
+})
+
+const lineHeight = computed(() => {
+  const baseHeight = 36
+  const reductionPerLevel = 4
+  const height = baseHeight - (currentLevel.value * reductionPerLevel)
+  return `${Math.max(16, height)}px`
 })
 </script>
 
 <template>
-  <div v-if="node" class="flex flex-col items-center relative">
+  <div v-if="node" class="flex flex-col items-center relative w-full">
+    
+    <!-- Kartu Member -->
     <div class="relative z-10">
       <component
         :is="node.username ? MemberCard : EmptySlot"
@@ -32,25 +51,41 @@ const sortedChildren = computed(() => {
       />
     </div>
 
-    <div v-if="node.children.length" class="h-6 w-px bg-gray-400"></div>
+    <!-- Anak-anak -->
+    <template v-if="node.username">
+      <!-- Garis vertikal dari node ke horizontal -->
+      <div class="w-px bg-gray-400" :style="{ height: lineHeight }"></div>
 
-    <div
-      v-if="node.children.length"
-      class="relative w-full flex justify-center items-start"
-    >
+      <!-- Garis horizontal dan vertikal ke anak -->
       <div
-        class="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-px bg-gray-400"
-      ></div>
+        class="relative h-4"
+        :style="{ width: `${displayChildren.length * 200}px` }"
+      >
+        <div class="absolute top-0 left-0 right-0 h-px bg-gray-400"></div>
+        <div
+          v-for="(_, index) in displayChildren.length"
+          :key="index"
+          class="absolute top-0 w-px bg-gray-400"
+          :style="{ 
+            left: `${(index / (displayChildren.length - 1)) * 100}%`,
+            transform: 'translateX(-50%)',
+            height: '16px'
+          }"
+        ></div>
+      </div>
 
-      <div class="flex gap-8 mt-2 z-10">
-        <!-- Sort children by position -->
+      <!-- Node anak-anak -->
+      <div
+        class="flex justify-center gap-4 mt-3"
+        :style="{ width: `${displayChildren.length * 200}px` }"
+      >
         <MemberNode
-          v-for="(child, idx) in sortedChildren"
-          :key="idx"
+          v-for="child in displayChildren"
+          :key="child.id"
           :node="child"
+          :level="currentLevel + 1"
         />
       </div>
-    </div>
+    </template>
   </div>
 </template>
-
