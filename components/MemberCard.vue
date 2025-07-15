@@ -1,7 +1,7 @@
 <script setup lang="ts">
 defineProps<{
   username: string
-  joinDate: string
+  createdAt: string
 }>()
 </script>
 
@@ -10,7 +10,7 @@ defineProps<{
     <div class="flex flex-col items-center gap-2">
       <UIcon name="i-lucide-user" class="w-12 h-12" />
       <div class="font-bold">{{ username }}</div>
-      <div class="text-sm">Bergabung {{ joinDate }}</div>
+      <div class="text-sm">Bergabung {{ createdAt }}</div>
 
       <div class="grid grid-cols-3 gap-1 mt-2 text-xs">
         <div>0</div>

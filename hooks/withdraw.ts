@@ -44,7 +44,6 @@ const state = reactive<Partial<Schema>>({
         },
         onSuccess: async (data)=>{
             queryClient.invalidateQueries({queryKey:['user']}),
-            // queryClient.invalidateQueries({queryKey:['login']})
             toast.add({
                 color:'error',
                 description:data.message

@@ -5,42 +5,27 @@ import EmptySlot from "~/components/EmptySlot.vue"
 
 const props = defineProps<{
   node: {
-    id: number
+    id: string
     username: string | null
     joinDate?: string
-    children: Array<{
-      id: number
-      username: string | null
-      joinDate?: string
-      position: 'left' | 'right'
-      children: any[]
-    }>
-  },
-  level?: number
+    position: 'left' | 'right'
+    left: any | null
+    right: any | null
+  }
 }>()
 
-const currentLevel = computed(() => props.level ?? 0)
 
-const displayChildren = computed(() => {
-  const leftChild = props.node.children.find(c => c.position === 'left') 
-    || { id: props.node.id * 10 + 1, username: null, position: 'left', children: [] }
 
-  const rightChild = props.node.children.find(c => c.position === 'right')
-    || { id: props.node.id * 10 + 2, username: null, position: 'right', children: [] }
+const displayChildren = computed(() => [
+  props.node.left,
+  props.node.right
+])
 
-  return [leftChild, rightChild]
-})
 
-const lineHeight = computed(() => {
-  const baseHeight = 36
-  const reductionPerLevel = 4
-  const height = baseHeight - (currentLevel.value * reductionPerLevel)
-  return `${Math.max(16, height)}px`
-})
 </script>
 
 <template>
-  <div v-if="node" class="flex flex-col items-center relative w-full">
+  <div class="flex flex-col items-center relative w-full">
     
     <!-- Kartu Member -->
     <div class="relative z-10">
@@ -51,15 +36,13 @@ const lineHeight = computed(() => {
       />
     </div>
 
-    <!-- Anak-anak -->
+    <!-- Garis ke anak -->
     <template v-if="node.username">
-      <!-- Garis vertikal dari node ke horizontal -->
-      <div class="w-px bg-gray-400" :style="{ height: lineHeight }"></div>
+      <div class="w-px bg-gray-400 h-[16px]"></div>
 
-      <!-- Garis horizontal dan vertikal ke anak -->
       <div
         class="relative h-4"
-        :style="{ width: `${displayChildren.length * 200}px` }"
+        :style="{ width: `${displayChildren.length * 175}px` }"
       >
         <div class="absolute top-0 left-0 right-0 h-px bg-gray-400"></div>
         <div
@@ -76,14 +59,15 @@ const lineHeight = computed(() => {
 
       <!-- Node anak-anak -->
       <div
-        class="flex justify-center gap-4 mt-3"
+        class="flex justify-center gap-40 mt-3"
         :style="{ width: `${displayChildren.length * 200}px` }"
       >
         <MemberNode
           v-for="child in displayChildren"
+          
           :key="child.id"
           :node="child"
-          :level="currentLevel + 1"
+          
         />
       </div>
     </template>
