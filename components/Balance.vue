@@ -6,7 +6,7 @@ import type{ UserLogin } from "~/dto/dto";
 import DetailSaldo from "~/hooks/detailSaoldo";
 
 const {data} = DetailSaldo()
-const user = useState<UserLogin>("user")
+
 </script>
 
 <template>
